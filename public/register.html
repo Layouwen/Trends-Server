@@ -34,10 +34,13 @@
                 url: '/register',
                 contentType: 'text/json; charset=UTF-8',
                 data: JSON.stringify({
-                    name,
-                    password
-                }) // name: name // password: password
-            })
+                    name, // name: name 
+                    password // password: password
+                })
+            }).then(() => {
+                alert('注册成功')
+                location.href = '/logining.html'
+            }, () => {})
         })
     </script>
 </body>
