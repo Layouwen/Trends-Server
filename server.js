@@ -20,9 +20,60 @@ var server = http.createServer(function (request, response) {
     var method = request.method
 
     /******** main start ************/
+    if (path === '/sign_in' && method === 'POST') {
+        // read database
+        let userArray = JSON.parse(fs.readFileSync('./database/users.json')) // read database
+        const array = []
+        request.on('data', (chunk) => {
+            array.push(chunk)
 
-    if (path === '/register' && method === 'POST') {
+        })
+        request.on('end', () => {
+            // convert string
+            const string = Buffer.concat(array).toString()
+            // convert obj
+            const obj = JSON.parse(string)
+            // find user
+            console.log(obj)
+            console.log(userArray)
+            const user = userArray.find(user => user.name === obj.name && user.password === obj.password) // 成功返回符合的对象，失败返回undefined
+            console.log('---------')
+            console.log(user)
+            if (user === undefined) {
+                response.statusCode = 400
+                response.setHeader('content-Type', 'text/JSON; charset=UTF-8')
+                response.end(`{"error":4001}`)
+            } else {
+                response.statusCode = 200
+                // 设置 Cookie
+                response.setHeader('set-Cookie', 'logined=1')
+                response.end()
+            }
+        })
+    } else if (path === '/home.html') {
+        // 获取 Cookie
+        const cookie = request.headers['cookie']
+        console.log(cookie)
+        // 判断 Cookie 是否正确
+        if (cookie === 'logined=1') {
+            // 读取源文件内容
+            const homeHtml = fs.readFileSync('./public/home.html').toString()
+            // 替换文字
+            const string = homeHtml.replace('{{loginStatus}}', '已登录')
+            response.write(string)
+            response.end()
+        } else {
+            // 读取源文件内容
+            const homeHtml = fs.readFileSync('./public/home.html').toString()
+            // 替换文字
+            const string = homeHtml.replace('{{loginStatus}}', '未登录')
+            response.write(string)
+            response.end()
+        }
+        response.end()
+    } else if (path === '/register' && method === 'POST') {
         response.setHeader('Content-Type', 'text/html; charset=UTF-8')
+        // read database
         let userArray = JSON.parse(fs.readFileSync('./database/users.json')) // read database
         const array = []
         request.on('data', (chunk) => {
