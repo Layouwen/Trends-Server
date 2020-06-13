@@ -21,24 +21,27 @@ var server = http.createServer(function (request, response) {
 
     /******** main start ************/
 
-    console.log('有小可爱访问服务器。路径（带查询参数）为：' + pathWithQuery)
-
-    if (path === '/') {
-        response.statusCode = 200
-        response.setHeader('Content-Type', 'text/html;charset=utf-8')
-        response.write(`我是根路径`)
-        response.end()
-    } else if (path === '/hello') {
-        response.statusCode = 200
-        response.setHeader('Content-Type', 'text/css;charset=utf-8')
-        response.write(`body{color: red;}`)
-        response.end()
-    } else {
-        response.statusCode = 404
-        response.setHeader('Content-Type', 'text/html;charset=utf-8')
-        response.write(`你输入的路径有错误哦~`)
-        response.end()
+    response.statusCode = 200
+    let content
+    // setting index
+    const filePath = path === '/' ? '/index.html' : path
+    // judge type
+    const index = filePath.lastIndexOf('.')
+    const suffix = filePath.substring(index)
+    const fileType = {
+        '.html': 'text/html',
+        '.css': 'text/css',
+        '.js': 'text/javascript'
     }
+    response.setHeader('Content-Type', `${fileType[suffix] || "text/html"};charset=utf-8`)
+    try {
+        content = fs.readFileSync(`./public${filePath}`)
+    } catch (error) {
+        content = '文件路径不存在'
+        response.statusCode = 404
+    }
+    response.write(content)
+    response.end()
 
     /******** main end ************/
 })
