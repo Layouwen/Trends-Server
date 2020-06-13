@@ -1,4 +1,4 @@
-# Trends-Server NodeJs静态服务器
+# Trends-Server NodeJs动态服务器
 
 ## 介绍
 
