@@ -46,29 +46,33 @@ var server = http.createServer(function (request, response) {
             } else {
                 response.statusCode = 200
                 // 设置 Cookie
-                response.setHeader('set-Cookie', 'logined=1')
+                response.setHeader('set-Cookie', `user_id=${user.id}; HttpOnly`)
                 response.end()
             }
         })
     } else if (path === '/home.html') {
         // 获取 Cookie
         const cookie = request.headers['cookie']
-        console.log(cookie)
-        // 判断 Cookie 是否正确
-        if (cookie === 'logined=1') {
-            // 读取源文件内容
+        // 读取 Cookie 中的 id 值
+        let userId
+        try {
+            userId = cookie.split(';').filter(s => s.indexOf('user_id=') >= 0)[0].split('=')[1]
+        } catch (error) {}
+        if (userId) {
+            let userArray = JSON.parse(fs.readFileSync('./database/users.json')) // read database
+            let user = userArray.find(user => user.id.toString() === userId)
             const homeHtml = fs.readFileSync('./public/home.html').toString()
-            // 替换文字
-            const string = homeHtml.replace('{{loginStatus}}', '已登录')
-            response.write(string)
-            response.end()
+            let string
+            if (user) {
+                string = homeHtml.replace('{{loginStatus}}', '已登录').replace('{{user.name}}', user.name)
+                response.write(string)
+            }
         } else {
             // 读取源文件内容
             const homeHtml = fs.readFileSync('./public/home.html').toString()
             // 替换文字
-            const string = homeHtml.replace('{{loginStatus}}', '未登录')
+            const string = homeHtml.replace('{{loginStatus}}', '未登录').replace('{{user.name}}', '')
             response.write(string)
-            response.end()
         }
         response.end()
     } else if (path === '/register' && method === 'POST') {
