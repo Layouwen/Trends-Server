@@ -20,6 +20,9 @@ var server = http.createServer(function (request, response) {
     var method = request.method
 
     /******** main start ************/
+    // 读取 session 文件,转化为对象
+    const session = JSON.parse(fs.readFileSync('./session.json').toString())
+
     if (path === '/sign_in' && method === 'POST') {
         // 读数据库
         let userArray = JSON.parse(fs.readFileSync('./database/users.json'))
@@ -35,30 +38,37 @@ var server = http.createServer(function (request, response) {
             const obj = JSON.parse(string)
             // 找到符合的 user
             const user = userArray.find(user => user.name === obj.name && user.password === obj.password) // 成功返回符合的对象，失败返回undefined
-            console.log(user)
             if (user === undefined) { // 失败
                 response.statusCode = 400
                 response.setHeader('content-Type', 'text/JSON; charset=UTF-8')
                 response.end(`{"errorCode":4001}`)
             } else { // 成功
                 response.statusCode = 200
-                // // 设置 Cookie
-                response.setHeader("Set-Cookie", `'user_id=${user.id}; HttpOnly'`)
+                // 设置 Cookie
+                const random = Math.random()
+                session[random] = {
+                    user_id: user.id
+                }
+                // 写入数据
+                fs.writeFileSync('./session.json', JSON.stringify(session))
+                response.setHeader("Set-Cookie", `'session_id=${random}; HttpOnly'`)
                 response.end()
             }
         })
     } else if (path === '/home.html') {
         // 获取 Cookie
         const cookie = request.headers['cookie']
-        let userId
+        let sessionId
         try { // 读取 Cookie 中的 id 值
-            userId = cookie.split(';').filter(s => s.indexOf('user_id=') >= 0)[0].split('=')[1]
+            sessionId = cookie.split(';').filter(s => s.indexOf('session_id=') >= 0)[0].split('=')[1]
         } catch (error) {}
-        if (userId) {
+        if (sessionId && session[sessionId]) {
+            // 从 session 中读取对应的值
+            const userId = session[sessionId].user_id
             // 读数据库
             let userArray = JSON.parse(fs.readFileSync('./database/users.json'))
             // 找到符合的 user
-            let user = userArray.find(user => user.id.toString() === userId)
+            let user = userArray.find(user => user.id === userId)
             const homeHtml = fs.readFileSync('./public/home.html').toString()
             let string
             if (user) {
