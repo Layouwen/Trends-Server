@@ -6,8 +6,8 @@
 
 ## 功能介绍
 
-/register.html 注册
-/sign_in.html 登录
+/register.html 注册  
+/sign_in.html 登录  
 每次登录将随机生成一个session保存在服务器，用于检测是否登录
 
 ## 使用方法
