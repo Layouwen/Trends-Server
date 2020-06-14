@@ -21,45 +21,43 @@ var server = http.createServer(function (request, response) {
 
     /******** main start ************/
     if (path === '/sign_in' && method === 'POST') {
-        // read database
-        let userArray = JSON.parse(fs.readFileSync('./database/users.json')) // read database
+        // 读数据库
+        let userArray = JSON.parse(fs.readFileSync('./database/users.json'))
         const array = []
+        // 每次接受数据就添加进数组
         request.on('data', (chunk) => {
             array.push(chunk)
-
         })
         request.on('end', () => {
-            // convert string
+            // 转化字符串
             const string = Buffer.concat(array).toString()
-            // convert obj
+            // 在转化为对象
             const obj = JSON.parse(string)
-            // find user
-            console.log(obj)
-            console.log(userArray)
+            // 找到符合的 user
             const user = userArray.find(user => user.name === obj.name && user.password === obj.password) // 成功返回符合的对象，失败返回undefined
-            console.log('---------')
             console.log(user)
-            if (user === undefined) {
+            if (user === undefined) { // 失败
                 response.statusCode = 400
                 response.setHeader('content-Type', 'text/JSON; charset=UTF-8')
-                response.end(`{"error":4001}`)
-            } else {
+                response.end(`{"errorCode":4001}`)
+            } else { // 成功
                 response.statusCode = 200
-                // 设置 Cookie
-                response.setHeader('set-Cookie', `user_id=${user.id}; HttpOnly`)
+                // // 设置 Cookie
+                response.setHeader("Set-Cookie", `'user_id=${user.id}; HttpOnly'`)
                 response.end()
             }
         })
     } else if (path === '/home.html') {
         // 获取 Cookie
         const cookie = request.headers['cookie']
-        // 读取 Cookie 中的 id 值
         let userId
-        try {
+        try { // 读取 Cookie 中的 id 值
             userId = cookie.split(';').filter(s => s.indexOf('user_id=') >= 0)[0].split('=')[1]
         } catch (error) {}
         if (userId) {
-            let userArray = JSON.parse(fs.readFileSync('./database/users.json')) // read database
+            // 读数据库
+            let userArray = JSON.parse(fs.readFileSync('./database/users.json'))
+            // 找到符合的 user
             let user = userArray.find(user => user.id.toString() === userId)
             const homeHtml = fs.readFileSync('./public/home.html').toString()
             let string
@@ -82,7 +80,6 @@ var server = http.createServer(function (request, response) {
         const array = []
         request.on('data', (chunk) => {
             array.push(chunk)
-
         })
         request.on('end', () => {
             // convert string
@@ -100,8 +97,8 @@ var server = http.createServer(function (request, response) {
             userArray.push(newUser)
             // write data
             fs.writeFileSync('./database/users.json', JSON.stringify(userArray))
-            response.end()
         })
+        response.end()
     } else {
         response.statusCode = 200
         let content
