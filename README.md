@@ -1,14 +1,14 @@
-# Trends-Server NodeJs动态服务器
+# Trends-Server NodeJs 动态服务器
 
 ## 介绍
 
-使用NodeJs简单搭建的一个动态服务器，用JSONP模拟数据库。
+使用 NodeJs 简单搭建的一个动态服务器，用 JSON 模拟数据库。
 
 ## 功能介绍
 
 /register.html 注册  
 /sign_in.html 登录  
-每次登录将随机生成一个session保存在服务器，用于检测是否登录
+每次登录将随机生成一个 session 保存在服务器，用于检测是否登录
 
 ## 使用方法
 

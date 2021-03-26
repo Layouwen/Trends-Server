@@ -1,48 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
+    />
     <title>登录</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <form id="signInForm">
-        <div>
-            <label for="">用户名：<input type="text" name="name" id=""></label>
-        </div>
-        <div>
-            <label for="">密码：<input type="password" name="password" id=""></label>
-        </div>
-        <div>
-            <button type="submit">登录</button>
-        </div>
+      <div>
+        <label for="">
+          用户名：
+          <input type="text" name="name" id="" />
+        </label>
+      </div>
+      <div>
+        <label for="">
+          密码：
+          <input type="password" name="password" id="" />
+        </label>
+      </div>
+      <div>
+        <button type="submit">登录</button>
+      </div>
     </form>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        let $form = $('#signInForm')
-        $form.on('submit', (e) => {
-            e.preventDefault()
-            // get name password
-            const name = $form.find("input[name=name]").val()
-            const password = $form.find('input[name=password').val()
-            // pass AJAX post data
-            $.ajax({
-                method: 'POST',
-                url: '/sign_in',
-                contentType: 'text/json; charset=UTF-8',
-                data: JSON.stringify({
-                    name,
-                    password
-                })
-            }).then(() => {
-                alert('登录成功')
-                location.href = '/home.html'
-            }, () => {})
+      let $form = $('#signInForm')
+      $form.on('submit', e => {
+        e.preventDefault()
+        // get name password
+        const name = $form.find('input[name=name]').val()
+        const password = $form.find('input[name=password').val()
+        // pass AJAX post data
+        $.ajax({
+          method: 'POST',
+          url: '/sign_in',
+          contentType: 'text/json; charset=UTF-8',
+          data: JSON.stringify({
+            name,
+            password,
+          }),
+        }).then(() => {
+          alert('登录成功')
+          location.href = '/home.html'
         })
+      })
     </script>
-</body>
-
+  </body>
 </html>
